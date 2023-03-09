@@ -27,11 +27,11 @@ described below by over-riding the built-in ranking models in Lucene.
       1. [Input Queries](#221-input-queries)
       2. [Output Format](#222-output-format)
       3. [Formal Evaluation](#223-formal-evaluation)
-3. [Source Code Details](#source-code-details)
-   1. [Constants Used](#constants-used)
-   2. [File and Method Descriptions](#file-and-method-descriptions)
-4. [More Information](#more-information)
-5. [References](#references)
+3. [Source Code Details](#3-source-code-details)
+   1. [Constants Used](#31-constants-used)
+   2. [File and Method Descriptions](#32-file-and-method-descriptions)
+4. [More Information](#4-more-information)
+5. [References](#5-references)
 
 ## 1 Background Information
 
@@ -119,7 +119,7 @@ topic_id  \t Q0 \t document_id \t rank \t score \t your_id
 Example result:
 
 ```
-351      Q0      FT944-4100      386      12.699199      alal25
+351      Q0      FT944-4100      386      12.699199         arjlal
 ```
 
 #### 2.2.3 Formal Evaluation
@@ -138,18 +138,18 @@ The program uses BM25 to search the index, retrieves the top 1000 documents for 
 the results (concatenated) in `results/BM25results.txt` as follows:
 
 ```
-351     Q0      FT934-4848      1       28.310038     alal25
-351     Q0      FT921-6603      2       26.861269     alal25
-351     Q0      FT941-9999      3       26.669258     alal25
+351     Q0      FT934-4848      1       28.310038        arjlal
+351     Q0      FT921-6603      2       26.861269        arjlal
+351     Q0      FT941-9999      3       26.669258        arjlal
 ...
-351     Q0      FT941-7250      999     9.0101385     alal25
-351     Q0      FT942-11134     1000    9.006053      alal25    # up to this point the results of the first query
-352     Q0      FT943-904       1       21.337904     alal25
-352     Q0      FT934-11803     2       16.779995     alal25
-352     Q0      LA120290-0163   3       16.102392     alal25
+351     Q0      FT941-7250      999     9.0101385        arjlal
+351     Q0      FT942-11134     1000    9.006053         arjlal    # up to this point the results of the first query
+352     Q0      FT943-904       1       21.337904        arjlal
+352     Q0      FT934-11803     2       16.779995        arjlal
+352     Q0      LA120290-0163   3       16.102392        arjlal
 ...
-400     Q0      LA040690-0150   999     9.383813      alal25
-400     Q0      FT934-13571     1000    9.378035      alal25    # query results ends
+400     Q0      LA040690-0150   999     9.383813         arjlal
+400     Q0      FT934-13571     1000    9.378035         arjlal    # query results ends
 ```
 
 You can evaluate using:
@@ -175,8 +175,8 @@ Java application developed with SDK `corretto-18`.
 1. `IndexFiles.java` - used for indexing set of documents
 
 2. `IndexUtils.java` - contains utility functions for the pipeline
+   
    METHODS
-    -------
     - `writeScoreDocToOutput()`
       writes the document scores and ranks from a `ScoreDoc[]` type variable to output file
     - `writeDocMapToOutput()`
@@ -195,24 +195,24 @@ Java application developed with SDK `corretto-18`.
 
 3. `ProbabilisticRanker.java` - controller for the assignment; parses arguments, does initial retrievals for each
    query based on the ranking method, re ranks them if it's RM1 or RM3, and writes final ranks and scores to output
-   ARGUMENTS
-    ---------
+
     ```
     ProbabilisticRanker [RANKING_METHOD] [INDEX_PATH] [QUERIES_PATH] [OUTPUT_FILE_PATH]
    ```
-   `RANKING_METHOD` can be one of `BM25` / `LM` / `RM1` / `RM3`
+   _`RANKING_METHOD` can be one of `BM25` / `LM` / `RM1` / `RM3`_
 
 4. `QueryBuilder.java` - creates a map of queries from the query file with query number as key and Title + Description as value
+   
    METHODS
-    -------
     - `buildQueries()`
       does above-mentioned task
 
 5. `RM1.java` - Re ranks set of scored documents based on RM1 ranking method
+
    METHODS
-    -------
     - `reRank()`
       re ranks a set of documents and returns a map of `<Document ID, Document Score>`
+    
       Steps done:
       * remove stop words from query
       * get document query likelihoods (taken from `LMDirichletSimilarity` QLEs)
@@ -233,21 +233,22 @@ Java application developed with SDK `corretto-18`.
       creates a map from Document ID to their query likelihoods (taken from `LMDirichletSimilarity` QLEs)
     - `getFinalDocScores()`
       re scores documents based on the term weights and document query likelihoods
-    - g`etExpandedQuery()`
+    - `getExpandedQuery()`
       creates the expanded query of old query + top 10 terms (ignoring terms already in query)
 
 6. `RM3.java` - Re ranks a set of documents based on RM3 ranking method
+
    METHODS
-    -------
     - `reRank()`
       re ranks a set of documents and returns a map of `<Document ID, Document Score>`
+    
       Steps done:
       * gets RM1 document ranks
       * generates new scores that are `(lambda * RM1score) + ((1 - lambda) * QLE)`; `lambda` value is `0.2`
 
 7. `SearchFiles.java` - searches the index and returns `ScoreDocs[]` object
+
    METHODS
-    -------
     - `searchIndex()`
       searches the index and returns `ScoreDocs[]` objects
     - `createIndexReader()`
