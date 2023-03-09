@@ -263,6 +263,8 @@ Java application developed with SDK `corretto-18`.
 
 Results obtained for this program is available in [results](./results).
 
+For additional information on the relevance models implemented, see [relevance_models](./relevance_models). 
+
 ## 5 References
 - Lavrenko, V., & Croft, W. B. (2001). _Relevance based language models_. In Proceedings of the 24th annual international
 ACM SIGIR conference on Research and development in information retrieval. SIGIR01: 24th ACM/SIGIR International
